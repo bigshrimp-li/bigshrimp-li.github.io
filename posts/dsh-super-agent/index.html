@@ -36,13 +36,13 @@
 <p>一个 Thread 可以向多个 Ticket 投递，每个 Worker 独立判断：任务内的消息继续处理，无关消息无需动作，超出范围的请求退回 Router。人类追问只要仍有 Worker 负责，Router 就不会重复分配；用户要求停止时例外。</p>
 <h5 id="router-prompts">提示词与工具</h5>
 <p>我们先看 Router 的系统提示词的大致内容。</p>
-<figure><a class="diagram" href="assets/figure-40.webp" style="aspect-ratio:2160/486"><img style="position:absolute;width:118.519%;max-width:none;top:0.000%;left:-9.259%" width="2560" height="2560" loading="lazy" src="assets/figure-40.webp" alt="Router 系统提示词的组织顺序"></a><figcaption>图 8　Router 系统提示词的组织顺序　<a href="assets/figure-40.webp">查看大图</a></figcaption></figure>
+<figure><a class="diagram" href="assets/figure-40.webp"><img width="2180" height="492" loading="lazy" src="assets/figure-40.webp" alt="Router 系统提示词的组织顺序"></a><figcaption>图 8　Router 系统提示词的组织顺序　<a href="assets/figure-40.webp">查看大图</a></figcaption></figure>
 <p>Router的提示词明确说明了系统整体的分工，重点说明了订阅与分流的规则，并且针对不同的接单策略定义了不同的工单创建策略。此外Router还携带了下列工具，用于感受环境数据，完善整个决策链路。下表省略 orchestrator_ 前缀，例如 eval_decide 的完整名称是 orchestrator_eval_decide。</p>
 <table><thead><tr><th>工具</th><th>模型用它做什么</th></tr></thead><tbody><tr><td><code>read</code></td><td>查询消息、Thread、Ticket、Report 和配置。</td></tr><tr><td><code>route</code></td><td>提交 accept、attach、stop 或 ignore，处理明确请求；也可直接忽略明显无关的待推断候选。</td></tr><tr><td><code>eval</code></td><td>加载待推断候选的讨论窗口和相关任务，供当前模型判断。</td></tr><tr><td><code>eval_read</code></td><td>继续读取该评估需要的原消息、更多讨论、图片或相关文件。</td></tr><tr><td><code>eval_decide</code></td><td>提交主动评估结论、逐条规则判断和实施依据，由代码校验；不是另调用一个评估模型。</td></tr><tr><td><code>reply</code></td><td>向用户转交结果、回答或需要人决策的问题。</td></tr></tbody></table>
 <p>此外还有任务状态查询、重试、补充事实、重新送评、取消订阅和配置维护工具，以及受限的技能、文件和命令工具。它们服务于路由与管理；具体实现仍交给 Worker。</p>
 <h6 id="context">上下文组织</h6>
 <p>我们先看 Router 如何组织上下文。飞书、GitHub 的候选消息、订阅投递通知，以及多个 Worker 的关键反馈，都进入同一个主 Session；Router 的工具调用、返回和部分状态变化也会追加。每次模型请求带上当前 SP、工具定义和保留的历史，用 Thread、Trigger、Ticket 标识区分来源与任务。下图展示历史如何累积，以及压缩后如何继续使用。</p>
-<figure><a class="diagram" href="assets/figure-46.webp"><img width="2560" height="2560" loading="lazy" src="assets/figure-46.webp" alt="主 Session 的上下文与压缩"></a><figcaption>图 9　主 Session 的上下文与压缩　<a href="assets/figure-46.webp">查看大图</a></figcaption></figure>
+<figure><a class="diagram" href="assets/figure-46.webp"><img width="2560" height="2088" loading="lazy" src="assets/figure-46.webp" alt="主 Session 的上下文与压缩"></a><figcaption>图 9　主 Session 的上下文与压缩　<a href="assets/figure-46.webp">查看大图</a></figcaption></figure>
 <p>主 Session 保留的是调度过程，不会合并 Worker 的完整对话。普通进度 Report 若未回答用户问题，不会转发；Report 摘要超过 600 字符会截断，并附上完整结果的读取入口。</p>
 <p><b>历史变长后，DSH 按上下文容量触发压缩。</b>每个执行步骤开始前，系统检查占用，不按消息条数或固定时间压缩。当前依赖版本的默认阈值如下，实际值随模型窗口、输出预留和配置变化：</p>
 <pre><code>压缩阈值 = min(上下文窗口 × 80%,<br>               上下文窗口 − 预留输出 tokens − 65,536)</code></pre>
@@ -52,7 +52,7 @@
 <p>裁剪工具结果、修改 SP 或工具定义、切换模型，都可能缩短可复用的前缀。同一个 Session 不保证缓存命中，实际情况应查看 prompt_cache_hit_tokens 和 prompt_cache_miss_tokens。</p>
 <h6 id="routing-example">工具调用</h6>
 <p>接着看 Router 如何使用这些上下文完成投递。话题 A 中，用户先请求修复 CSV 导出，再补充复现条件；评估启动前入队的消息可组成一个批次。Router 接单创建 T17，代码启动 Worker 并建立订阅；Worker 随后提交并绑定 PR #42。用户在未被订阅的话题 B 发来 M3“PR #42 仍有问题，请继续修复”，代码通过 PR Thread 的订阅关系找到 T17，将任务摘要加入候选卡。我们以下图为例。</p>
-<figure><a class="diagram" href="assets/figure-56.webp"><img width="2560" height="2560" loading="lazy" src="assets/figure-56.webp" alt="一次跨话题投递中的模型与工具调用"></a><figcaption>图 10　一次跨话题投递中的模型与工具调用　<a href="assets/figure-56.webp">查看大图</a></figcaption></figure>
+<figure><a class="diagram" href="assets/figure-56.webp"><img width="2560" height="2172" loading="lazy" src="assets/figure-56.webp" alt="一次跨话题投递中的模型与工具调用"></a><figcaption>图 10　一次跨话题投递中的模型与工具调用　<a href="assets/figure-56.webp">查看大图</a></figcaption></figure>
 <p>M3 进入主 Session 后，模型先用 orchestrator_read 补读 T17，再用 orchestrator_route 关联消息。每次工具调用和返回都会追加到历史，供下一次请求使用；任务信息已经足够时，可以跳过补读。下面只保留关键调用：</p>
 <pre><code>user：M3 原文、话题 B、引用得到的 T17 摘要<br>assistant → orchestrator_read：{&quot;resource&quot;:&quot;ticket/T17&quot;}<br>tool → 返回 T17 的任务范围、关联 Thread 和近期 Report<br>assistant → orchestrator_route：<br>{&quot;decisions&quot;:[{&quot;kind&quot;:&quot;attach&quot;,&quot;trigger_id&quot;:&quot;M3&quot;,&quot;ticket_id&quot;:&quot;T17&quot;}]}<br>tool → 返回关联结果和 Ticket 摘要；模型确认成功后结束本轮</code></pre>
 <p>关联成功后，代码将 M3 投递给原 Worker，并让 T17 订阅话题 B。随后 B 中的 M4“补充复现附件”直接按订阅投递，Router 收到 follow_up，不再重复关联。对于待推断请求，模型则使用 eval、按需 eval_read 和 eval_decide，相关调用和返回也按同样方式追加。</p>
@@ -60,7 +60,7 @@
 <p>我们先区分 explicit 和 inferred，再看接单模式如何生效。两者由代码根据来源、发送者、是否定向请求和准入配置判定，模型不能自行更改请求类型。</p>
 <ul><li><b>explicit（明确请求）</b>：按准入规则认定为明确交办，例如名单内用户 @机器人分配任务。Router 按权限和分配规则处理。</li><li><b>inferred（待推断请求）</b>：需要结合讨论判断是否应接单。讨论可以已经很明确，但尚未按准入规则认定为明确交办。</li></ul>
 <p>判断讨论中是否有可接的工作，叫“主动评估”；评估通过后创建 Ticket，叫“主动接单”。两条路径都由代码创建 Ticket。我们以下图为例，看同一项文案修改如何处理。</p>
-<figure><a class="diagram" href="assets/figure-64.webp"><img width="2560" height="2560" loading="lazy" src="assets/figure-64.webp" alt="明确请求、待推断请求与接单模式"></a><figcaption>图 11　明确请求、待推断请求与接单模式　<a href="assets/figure-64.webp">查看大图</a></figcaption></figure>
+<figure><a class="diagram" href="assets/figure-64.webp"><img width="2560" height="2300" loading="lazy" src="assets/figure-64.webp" alt="明确请求、待推断请求与接单模式"></a><figcaption>图 11　明确请求、待推断请求与接单模式　<a href="assets/figure-64.webp">查看大图</a></figcaption></figure>
 <p><b>提示词指导模型判断。</b>每次请求的 SP 都带上当前模式和启用规则。explicit 走分配工具 route；inferred 由模型结合上下文检查实施意图、目标和规则，通过 eval_decide 提交判断与依据。语义是否匹配仍依靠模型，代码只校验提交结果和执行条件。</p>
 <p><b>代码控制是否接单。</b>off 不让待推断请求进入主动评估；observe 允许评估，但即使模型提出接单，也只记录 would_accept，不创建 Ticket；auto 才允许在方向、依据、规则和授权检查通过后创建。引擎还会再次检查，模型误用 route accept 也不能绕过限制。默认模式为 observe。</p>
 <p>模式变化后，代码更新 Policy 版本，并让进行中的评估重新判断。从 auto 切换出去，还会通知相关 Worker 只收尾当前工作或报告放弃；收尾由 Worker 理解通知执行，恢复已结束任务则由代码重新校验授权。模式不是系统暂停开关：明确请求仍可处理，已有任务的订阅投递也不因此全部停止。</p>
@@ -68,7 +68,7 @@
 <p>Router 把消息分配给 Ticket 后，由 Worker 完成具体工作。每个 Ticket 保留一个逻辑 Worker、独立 Session 和固定工作目录；后续消息、重试和新的 Assignment 继续使用这份上下文。我们先看 Worker 收到什么，再看执行过程如何运行和扩展。</p>
 <h4 id="worker-scope">提示词与工具</h4>
 <p>我们先看 Worker 如何根据系统提示词判断任务范围、执行工作并报告结果。</p>
-<figure><a class="diagram" href="assets/figure-72.webp" style="aspect-ratio:2160/486"><img style="position:absolute;width:118.519%;max-width:none;top:0.000%;left:-9.259%" width="2560" height="2560" loading="lazy" src="assets/figure-72.webp" alt="Worker 系统提示词的组织顺序"></a><figcaption>图 12　Worker 系统提示词的组织顺序　<a href="assets/figure-72.webp">查看大图</a></figcaption></figure>
+<figure><a class="diagram" href="assets/figure-72.webp"><img width="2181" height="492" loading="lazy" src="assets/figure-72.webp" alt="Worker 系统提示词的组织顺序"></a><figcaption>图 12　Worker 系统提示词的组织顺序　<a href="assets/figure-72.webp">查看大图</a></figcaption></figure>
 <p>Worker 的系统提示词（SP）第一段同样是明确团队职责，告知Worker和Router的配合方式。然后告知Worker可以通过订阅去获取上下文，以及将越界请求退回 Router。与Router不一样的是，Worker后面明确了自己的执行范围、权限和工作方式。要求 Worker 阅读上下文、判断任务范围、选择方案并完成实施和验证，最后通过 Report 反馈。任务内的追问继续处理，超出范围的请求交回 Router，需要人决策时提出具体问题。主动接单的任务会额外加入范围限制，并随任务说明传入匹配的规则；用于全局主动评估的 Policy 则只提供给 Router。Worker 通过以下工具执行这些要求。工具分为工作工具和任务工具。前者用于读写文件、搜索、运行命令、后台作业、技能和子 Agent；后者把动作绑定到当前 Ticket。下表统一省略 orchestrator_ 前缀。</p>
 <table><thead><tr><th>任务工具</th><th>用途</th></tr></thead><tbody><tr><td><code>read</code></td><td>补读当前任务、相关消息、Thread 和 Report。</td></tr><tr><td><code>ack</code></td><td>确认已接下当前任务内的一条人类请求。</td></tr><tr><td><code>thread_follow</code></td><td>关注相关 Thread，仅作为上下文。</td></tr><tr><td><code>thread_unrelated</code></td><td>取消误关联 Thread；不能随意移除任务自身的 Thread。</td></tr><tr><td><code>trigger_handback</code></td><td>将超范围或属于其他任务的消息交回 Router。</td></tr><tr><td><code>report</code></td><td>反馈 progress、ready、blocked、failed 或 dropped；human_action 字段用于提出待人决策的问题。</td></tr></tbody></table>
 <p>Worker 的任务工具由代码绑定 Ticket ID，读取范围也受检查。需要人决策时，通过 report 的 human_action 交给 Router 转达；预设不提供直接提问的交互工具。普通进度留在任务内；明确回答用户问题的进度、关键结果和待决策问题会向 Router 反馈。</p>
@@ -83,24 +83,24 @@
 <figure><a class="diagram" href="assets/figure-84.webp"><img width="2560" height="2560" loading="lazy" src="assets/figure-84.webp" alt="Assignment、异步执行与恢复"></a><figcaption>图 13　Assignment、异步执行与恢复　<a href="assets/figure-84.webp">查看大图</a></figcaption></figure>
 <h4 id="executor">执行与扩展</h4>
 <p>Executor 是任务调度与 Agent 执行框架之间的适配边界。调度核心 Engine 通过统一接口启动执行、投递消息和停止工作，具体的 Executor 实现将这些操作转换为后端调用，并回传执行状态与结果。DSH、Codex、Claude Code 等框架都可以作为适配目标，各自负责模型与工具的 Agent Loop；接入时需要实现相同的执行约定。</p>
-<figure><a class="diagram" href="assets/figure-87.webp"><img width="2560" height="2560" loading="lazy" src="assets/figure-87.webp" alt="Executor 与执行后端的适配关系"></a><figcaption>图 14　Executor 与执行后端的适配关系　<a href="assets/figure-87.webp">查看大图</a></figcaption></figure>
+<figure><a class="diagram" href="assets/figure-87.webp"><img width="2560" height="1709" loading="lazy" src="assets/figure-87.webp" alt="Executor 与执行后端的适配关系"></a><figcaption>图 14　Executor 与执行后端的适配关系　<a href="assets/figure-87.webp">查看大图</a></figcaption></figure>
 <p>适配围绕三个接口展开：start 为待执行的 Assignment 安排启动，创建或复用所属 Ticket 的 Worker Session 和 workspace，装配任务说明、提示词及工具；deliver 将后续输入投递到对应 Session，分别回报投递成功、失败和实际读取状态；stop 在 Engine 结束相应 Ticket 或 Assignment 后，停止当前执行并清理关联的后台任务。启动和投递采用排队执行、回调报告的方式，不阻塞调度。适配器还需维护 Ticket 与 Session、workspace 的对应关系，配合完成消息去重、重试和中断恢复，让同一任务继续原有工作。</p>
 <p>反馈也需要统一：Worker 通过 Report 报告进度、结果和待人决策的问题，Executor 回报运行状态及异常；Engine 据此更新任务状态，并将待决策问题记录为 Attention，由 Router 转达。模型结束一轮输出不等于任务完成，适配器需要区分后台仍在执行、暂时空闲和执行失败等情况，Ticket 是否结束则由 Engine 按规则判断。这样，更换执行框架时，调度逻辑和任务连续性仍能保持一致。</p>
 <h4 id="environment">云端与执行环境</h4>
 <p>执行框架可以替换，执行环境也可以按任务选择。按照原文的设计，Super Agent 的 Agent Loop 在云端运行，Session 和任务状态由独立存储保存，再按需连接个人电脑、云端临时环境和常驻开发机。执行端通过轻量进程运行命令、返回结果，代码、依赖和本地配置继续留在原有环境中。参见<a href="https://threadnavigator.com/thread/2116857257245987236/">设计原文第 5 节（转载）</a>。</p>
-<figure><a class="diagram" href="assets/figure-92.webp" style="aspect-ratio:2070/992"><img style="position:absolute;width:123.671%;max-width:none;top:0.000%;left:-11.836%" width="2560" height="2560" loading="lazy" src="assets/figure-92.webp" alt="云端 Agent 如何连接不同执行环境"></a><figcaption>图 15　云端 Agent 如何连接不同执行环境　<a href="assets/figure-92.webp">查看大图</a></figcaption></figure>
+<figure><a class="diagram" href="assets/figure-92.webp"><img width="2084" height="997" loading="lazy" src="assets/figure-92.webp" alt="云端 Agent 如何连接不同执行环境"></a><figcaption>图 15　云端 Agent 如何连接不同执行环境　<a href="assets/figure-92.webp">查看大图</a></figcaption></figure>
 <p>个人电脑适合处理本地文件和未提交的修改；云端临时环境适合按需创建、完成后回收的隔离任务；常驻开发机适合依赖既有仓库、工具链和内网服务的持续开发。个人电脑离线时，云端 Agent 仍可接收消息和处理其他任务，依赖这台电脑的操作等待设备重新上线。</p>
 <p>Worker 的 Session 保存在云端，workspace 则位于所选执行环境中。同一 Ticket 持续关联这份工作目录，后续消息和重试沿用已有代码进度。例如，Worker 可以连接常驻开发机，在该机上通过 git worktree 从目标仓库创建任务目录，再完成修改、测试和提交；不需要先把整套开发环境搬到云端。使用临时环境时，需在回收前保存代码与产物，保证任务后续仍可继续。</p>
 <h4 id="recovery">持续运行与恢复</h4>
 <p>Worker 持续运行，需要控制并发，也要保留中断后可继续的状态。并发上限限制的是正在执行的 Worker，不是 Ticket 总数；等待用户的任务可以释放名额，让其他任务继续。我们以下图为例。</p>
-<figure><a class="diagram" href="assets/figure-97.webp"><img width="2560" height="2560" loading="lazy" src="assets/figure-97.webp" alt="并发调度、持续运行与中断恢复"></a><figcaption>图 16　并发调度、持续运行与中断恢复　<a href="assets/figure-97.webp">查看大图</a></figcaption></figure>
+<figure><a class="diagram" href="assets/figure-97.webp"><img width="2560" height="1787" loading="lazy" src="assets/figure-97.webp" alt="并发调度、持续运行与中断恢复"></a><figcaption>图 16　并发调度、持续运行与中断恢复　<a href="assets/figure-97.webp">查看大图</a></figcaption></figure>
 <p><b>并发调度。</b>任务从准备工作目录、启动到执行期间占用名额；正常执行中的后台作业也继续占用。交接给用户时释放名额，停止子 Agent；供用户验收的服务可以保留，但不占名额，也不因服务退出自动唤醒 Worker。人类续问和状态请求优先于新任务，并可使用额外一个名额；CI 等普通事件等待常规名额。每轮结束后的后台工作窗口为 30 分钟，到期停止 Shell 作业并报告等待，子 Agent 可以继续。</p>
 <p><b>失败处理。</b>启动、投递和反馈先持久化，再执行。消息投递失败会退避重试；暂时的模型或网络故障先自动重试三次，仍失败则保留现场，等待人补充信息或重试。工作目录准备失败不会自动重试，后续的人类消息或显式重试可以再次触发。</p>
 <p><b>中断恢复。</b>进程重启后，Session、workspace、订阅和未读输入仍保留。被中断且需要继续的执行会结束旧 Assignment、创建新 Assignment，在原任务中恢复；等待或受阻的任务通常保持原状，除非之后已有新输入。Worker 先核对代码和外部操作结果，再继续工作，避免重复提交或重复操作。具体规则见<a href="https://github.com/deepseek-ai/dsh-superagent-prototype/blob/6337fc823ce20251c8de8085948165c81aaa701e/docs/003-execution.md">执行与恢复</a>。</p>
 <p><a href="https://threadnavigator.com/thread/2116857257245987236/">设计原文</a>还提出独立的 Watchdog，定期检查系统故障和任务是否真正推进，识别进程仍在运行却反复空转的情况。这是系统外的巡检设计，与上述原型内的重试和恢复机制分开理解。</p>
 <h3 id="channel">Channel</h3>
 <p>任务执行后，还需要把结果送回用户，并让用户的回答回到原任务。我们以飞书中的“整理发布说明”为例：Source 将请求转成 Trigger 并归入 Thread，Router 请求接单，Engine 创建 Ticket 和 Assignment、建立订阅，再交给 Worker 执行。</p>
-<figure><a class="diagram" href="assets/figure-104.webp"><img width="2560" height="2560" loading="lazy" src="assets/figure-104.webp" alt="从飞书请求到人工决策与结果交付"></a><figcaption>图 17　从飞书请求到人工决策与结果交付　<a href="assets/figure-104.webp">查看大图</a></figcaption></figure>
+<figure><a class="diagram" href="assets/figure-104.webp"><img width="2560" height="1964" loading="lazy" src="assets/figure-104.webp" alt="从飞书请求到人工决策与结果交付"></a><figcaption>图 17　从飞书请求到人工决策与结果交付　<a href="assets/figure-104.webp">查看大图</a></figcaption></figure>
 <p><b>需要决策时。</b>Worker 通过 Report 的 human_action 提出“是否包含内部变更”，Engine 记录 Attention，Router 经 Channel 转达。问题优先发回引发这次提问的人类消息所在会话，否则回到任务起始会话。Router 转交具体问题，不代替用户作技术决定。</p>
 <p><b>用户回答后。</b>“仅公开内容”成为新的 Trigger，按 Thread 订阅直达原 Ticket。Worker 再确认范围，沿用 Session 和 workspace 继续整理，普通答复不会新建 Assignment。若用户提出另一项工作，Worker 交回 Router 重新分流；同一消息仍有其他 Worker 负责时，不重复接单。</p>
 <p><b>结果就绪后。</b>Worker 提交 ready Report，Router 将结果摘要和产物入口发回任务对应的 Channel。这个例子没有 PR，Engine 可结束 Ticket；代码任务则可能先交付 PR 供评审，再等待相关 PR 合并或关闭。结果通知与最终关闭通知分别处理，避免重复发送。</p>
