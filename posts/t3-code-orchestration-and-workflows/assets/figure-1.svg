@@ -1,0 +1,133 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 730" width="1200" height="730" role="img" aria-label="T3 Code 全局分层与事件溯源编排内核">
+  <defs>
+    <style>
+      text { font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans SC", "Segoe UI", sans-serif; }
+      .title { font-size: 19px; font-weight: 700; fill: #172d32; }
+      .subtitle { font-size: 13px; fill: #4f6668; }
+      .hdr { font-size: 13.5px; font-weight: 700; fill: #ffffff; }
+      .hdr-sub { font-size: 11.5px; fill: #e3f0f2; }
+      .pill-text { font-size: 12px; font-weight: 700; fill: #ffffff; }
+      .box-title { font-size: 13.5px; font-weight: 700; fill: #172d32; }
+      .box-sub { font-size: 12px; fill: #4f6668; }
+      .label { font-size: 12.5px; font-weight: 700; fill: #172d32; }
+      .small { font-size: 11.5px; fill: #4f6668; }
+      .code { font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace; font-size: 11px; fill: #172d32; }
+    </style>
+    <marker id="arr" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 1 1.5 L 8.8 5 L 1 8.5 z" fill="#4c686b"/>
+    </marker>
+    <marker id="arr-teal" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 1 1.5 L 8.8 5 L 1 8.5 z" fill="#0b6e67"/>
+    </marker>
+    <marker id="arr-amber" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 1 1.5 L 8.8 5 L 1 8.5 z" fill="#a87624"/>
+    </marker>
+    <marker id="arr-rose" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 1 1.5 L 8.8 5 L 1 8.5 z" fill="#a64538"/>
+    </marker>
+    <marker id="arr-blue" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 1 1.5 L 8.8 5 L 1 8.5 z" fill="#3b6296"/>
+    </marker>
+    <marker id="arr-violet" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 1 1.5 L 8.8 5 L 1 8.5 z" fill="#5d4b8c"/>
+    </marker>
+  </defs>
+  <rect x="0" y="0" width="1200" height="730" fill="#ffffff"/>
+
+  <text x="36" y="40" class="title">T3 Code 全局架构与事件溯源编排内核（Orchestration V2）</text>
+  <text x="36" y="62" class="subtitle">控制平面留在拥有工作区的 Server 环境；多端通过类型化契约连接，状态裁决与外部副作用严格解耦</text>
+  <rect x="36" y="84" width="1128" height="106" rx="12" fill="#edf3fa" stroke="#4b74ab" stroke-width="1.4" stroke-dasharray="6 4"/>
+  <text x="54" y="107" class="label" style="fill:#1c385c">客户端呈现层（多端一致，不直接读写远端文件系统或凭据）</text>
+  <rect x="54" y="118" width="240" height="58" rx="10" fill="#edf3fa" stroke="#4b74ab" stroke-width="1.6"/>
+  <text x="174.0" y="142.0" text-anchor="middle" class="box-title" style="fill:#1c385c">Web（app.t3.codes / 本地）</text>
+  <text x="174.0" y="161.5" text-anchor="middle" class="box-sub">React / Vite，纯投影渲染</text>
+  <rect x="314" y="118" width="250" height="58" rx="10" fill="#edf3fa" stroke="#4b74ab" stroke-width="1.6"/>
+  <text x="439.0" y="142.0" text-anchor="middle" class="box-title" style="fill:#1c385c">Desktop（Electron）</text>
+  <text x="439.0" y="161.5" text-anchor="middle" class="box-sub">内置 Server，渲染层仍走同边界</text>
+  <rect x="584" y="118" width="250" height="58" rx="10" fill="#edf3fa" stroke="#4b74ab" stroke-width="1.6"/>
+  <text x="709.0" y="142.0" text-anchor="middle" class="box-title" style="fill:#1c385c">Mobile（iOS / Android）</text>
+  <text x="709.0" y="161.5" text-anchor="middle" class="box-sub">React Native，远程审批与监控</text>
+  <rect x="854" y="118" width="292" height="58" rx="10" fill="#eef3f5" stroke="#4b6d80" stroke-width="1.6"/>
+  <text x="1000.0" y="142.0" text-anchor="middle" class="box-title" style="fill:#1b3340">client-runtime + contracts</text>
+  <text x="1000.0" y="161.5" text-anchor="middle" class="box-sub">共享连接、断线续订与 Effect Schema 契约</text>
+  <line x1="420" y1="190" x2="420" y2="236" stroke="#3b6296" stroke-width="1.8" marker-end="url(#arr-blue)"/>
+  <rect x="208.4" y="205.5" width="423.2" height="17" rx="4" fill="#ffffff" opacity="0.94"/>
+  <text x="420.0" y="218.0" text-anchor="middle" class="small" style="fill:#3b6296;font-weight:600">Authenticated WS / RPC（本地 / Tailscale / T3 Connect 中继）</text>
+  <line x1="920" y1="236" x2="920" y2="190" stroke="#0b6e67" stroke-width="1.8" marker-end="url(#arr-teal)"/>
+  <rect x="803.0" y="205.5" width="234.0" height="17" rx="4" fill="#ffffff" opacity="0.94"/>
+  <text x="920.0" y="218.0" text-anchor="middle" class="small" style="fill:#0b6e67;font-weight:600">实时增量投影推送（WireProjection）</text>
+  <rect x="36" y="238" width="1128" height="462" rx="14" fill="#f6f9f8" stroke="#4b6d80" stroke-width="1.8"/>
+  <text x="54" y="264" class="box-title" style="fill:#1b3340">T3 Code Server（apps/server · 所在环境即权威状态所有者）</text>
+  <rect x="56" y="284" width="240" height="134" rx="10" fill="#eef3f5" stroke="#4b6d80" stroke-width="1.6"/>
+  <path d="M 66 284 H 286 Q 296 284 296 294 V 316 H 56 V 294 Q 56 284 66 284 Z" fill="#365668"/>
+  <text x="176.0" y="305" text-anchor="middle" class="hdr">1. Orchestrator（纯裁决）</text>
+  <text x="176.0" y="342.5" text-anchor="middle" class="box-sub">串行受理 Command（无 I/O）</text>
+  <text x="176.0" y="362.0" text-anchor="middle" class="box-sub">依据当前投影决定 Domain Events</text>
+  <text x="176.0" y="381.5" text-anchor="middle" class="box-sub">校验权限天花板与运行态策略</text>
+  <text x="176.0" y="401.0" text-anchor="middle" class="code">Orchestrator.ts</text>
+  <rect x="348" y="278" width="384" height="194" rx="12" fill="#ffffff" stroke="#0b6e67" stroke-width="2"/>
+  <rect x="364" y="290" width="260" height="25" rx="12.5" fill="#0b6e67"/>
+  <text x="494.0" y="306.8" text-anchor="middle" class="pill-text">2. EventSinkV2 · 单 SQLite 原子事务</text>
+  <rect x="364" y="326" width="170" height="62" rx="10" fill="#e9f5f2" stroke="#168077" stroke-width="1.6"/>
+  <text x="449.0" y="352.0" text-anchor="middle" class="box-title" style="fill:#0c4742">Domain Events</text>
+  <text x="449.0" y="371.5" text-anchor="middle" class="box-sub">有界事件日志（兼容解码）</text>
+  <rect x="548" y="326" width="168" height="62" rx="10" fill="#e9f5f2" stroke="#168077" stroke-width="1.6"/>
+  <text x="632.0" y="352.0" text-anchor="middle" class="box-title" style="fill:#0c4742">Projections（权威）</text>
+  <text x="632.0" y="371.5" text-anchor="middle" class="box-sub">Thread / Run / Subagent</text>
+  <rect x="364" y="398" width="170" height="62" rx="10" fill="#fdf5e4" stroke="#c28e34" stroke-width="1.6"/>
+  <text x="449.0" y="424.0" text-anchor="middle" class="box-title" style="fill:#5e410d">Command Receipts</text>
+  <text x="449.0" y="443.5" text-anchor="middle" class="box-sub">按 commandId 幂等防重放</text>
+  <rect x="548" y="398" width="168" height="62" rx="10" fill="#fdf5e4" stroke="#c28e34" stroke-width="1.6"/>
+  <text x="632.0" y="424.0" text-anchor="middle" class="box-title" style="fill:#5e410d">Effect Outbox</text>
+  <text x="632.0" y="443.5" text-anchor="middle" class="box-sub">提交后待执行副作用意图</text>
+  <line x1="296" y1="352" x2="348" y2="352" stroke="#365668" stroke-width="1.8" marker-end="url(#arr)"/>
+  <rect x="287.1" y="325.5" width="69.8" height="17" rx="4" fill="#ffffff" opacity="0.94"/>
+  <text x="322.0" y="338.0" text-anchor="middle" class="small" style="fill:#365668;font-weight:600">事件+意图</text>
+  <rect x="784" y="284" width="360" height="160" rx="10" fill="#fdf5e4" stroke="#c28e34" stroke-width="1.6"/>
+  <path d="M 794 284 H 1134 Q 1144 284 1144 294 V 316 H 784 V 294 Q 784 284 794 284 Z" fill="#a87624"/>
+  <text x="964.0" y="305" text-anchor="middle" class="hdr">3. EffectWorker（线程车道异步执行）</text>
+  <text x="964.0" y="345.8" text-anchor="middle" class="box-sub">事务提交后按线程 Lane 消费 Outbox（18 类）</text>
+  <text x="964.0" y="365.2" text-anchor="middle" class="box-sub">• provider-turn.start / steer / interrupt</text>
+  <text x="964.0" y="384.8" text-anchor="middle" class="box-sub">• checkpoint.capture（隐藏 Git Ref 快照）</text>
+  <text x="964.0" y="404.2" text-anchor="middle" class="box-sub">• delegated-tasks.stop / runtime.continue</text>
+  <text x="964.0" y="423.8" text-anchor="middle" class="box-sub">执行完毕后回流为新 Command（崩溃不重放）</text>
+  <line x1="732" y1="376" x2="784" y2="376" stroke="#a87624" stroke-width="1.8" marker-end="url(#arr-amber)"/>
+  <rect x="738.8" y="349.5" width="38.4" height="17" rx="4" fill="#ffffff" opacity="0.94"/>
+  <text x="758.0" y="362.0" text-anchor="middle" class="small" style="fill:#a87624;font-weight:600">投递</text>
+  <path d="M 896 444 V 496 H 176 V 418" fill="none" stroke="#0b6e67" stroke-width="1.8" stroke-dasharray="5 4" marker-end="url(#arr-teal)"/>
+  <rect x="272.3" y="475.5" width="515.4" height="17" rx="4" fill="#ffffff" opacity="0.95"/>
+  <text x="530.0" y="488.0" text-anchor="middle" class="small" style="fill:#0b6e67;font-weight:600">副作用结果 / Provider 事件流 / Turn 完成与 Checkpoint 落盘 → 回流新 Command</text>
+  <path d="M 1036 444 V 526 H 218" fill="none" stroke="#4c686b" stroke-width="1.6"/>
+  <line x1="218" y1="526" x2="218" y2="550" stroke="#4c686b" stroke-width="1.8" marker-end="url(#arr)"/>
+  <line x1="526" y1="526" x2="526" y2="550" stroke="#4c686b" stroke-width="1.8" marker-end="url(#arr)"/>
+  <line x1="788" y1="526" x2="788" y2="550" stroke="#4c686b" stroke-width="1.8" marker-end="url(#arr)"/>
+  <line x1="1036" y1="526" x2="1036" y2="550" stroke="#4c686b" stroke-width="1.8" marker-end="url(#arr)"/>
+  <rect x="56" y="552" width="324" height="128" rx="10" fill="#edf3fa" stroke="#4b74ab" stroke-width="1.6"/>
+  <path d="M 66 552 H 370 Q 380 552 380 562 V 584 H 56 V 562 Q 56 552 66 552 Z" fill="#3b6296"/>
+  <text x="218.0" y="573" text-anchor="middle" class="hdr">Provider 适配器边界（provider-*）</text>
+  <text x="218.0" y="607.5" text-anchor="middle" class="box-sub">Claude / Codex / Cursor / Antigravity / Pi...</text>
+  <text x="218.0" y="627.0" text-anchor="middle" class="box-sub">非第一方 Agent 严格遵循 ACP，不写厂商特例</text>
+  <text x="218.0" y="646.5" text-anchor="middle" class="box-sub">编排器只读 declared capabilities，不按名分支</text>
+  <text x="218.0" y="666.0" text-anchor="middle" class="box-sub">原生权限模式直通，绝不伪造自动审批</text>
+  <rect x="400" y="552" width="252" height="128" rx="10" fill="#f2effa" stroke="#7763ad" stroke-width="1.6"/>
+  <path d="M 410 552 H 642 Q 652 552 652 562 V 584 H 400 V 562 Q 400 552 410 552 Z" fill="#5d4b8c"/>
+  <text x="526.0" y="573" text-anchor="middle" class="hdr">认证 MCP Server</text>
+  <text x="526.0" y="607.5" text-anchor="middle" class="box-sub">向每个线程注入编排工具集</text>
+  <text x="526.0" y="627.0" text-anchor="middle" class="box-sub">delegate_task / t3_thread_*</text>
+  <text x="526.0" y="646.5" text-anchor="middle" class="box-sub">preview_* / watch_pull_request</text>
+  <text x="526.0" y="666.0" text-anchor="middle" class="box-sub">ACP 终端兜底：acp-mcp-call</text>
+  <rect x="672" y="552" width="234" height="128" rx="10" fill="#e9f5f2" stroke="#168077" stroke-width="1.6"/>
+  <path d="M 682 552 H 896 Q 906 552 906 562 V 584 H 672 V 562 Q 672 552 682 552 Z" fill="#0b6e67"/>
+  <text x="789.0" y="573" text-anchor="middle" class="hdr">Workflow 引擎（Labs）</text>
+  <text x="789.0" y="607.5" text-anchor="middle" class="box-sub">Effect v4 确定性重放引擎</text>
+  <text x="789.0" y="627.0" text-anchor="middle" class="box-sub">监听 ~/.t3/workflows/*.ts</text>
+  <text x="789.0" y="646.5" text-anchor="middle" class="box-sub">按需懒加载 + 热重载保护</text>
+  <text x="789.0" y="666.0" text-anchor="middle" class="box-sub">与普通 Thread 无缝联动</text>
+  <rect x="926" y="552" width="218" height="128" rx="10" fill="#eef3f5" stroke="#4b6d80" stroke-width="1.6"/>
+  <path d="M 936 552 H 1134 Q 1144 552 1144 562 V 584 H 926 V 562 Q 926 552 936 552 Z" fill="#365668"/>
+  <text x="1035.0" y="573" text-anchor="middle" class="hdr">Git / Worktree / 终端</text>
+  <text x="1035.0" y="607.5" text-anchor="middle" class="box-sub">每线程隔离 Worktree</text>
+  <text x="1035.0" y="627.0" text-anchor="middle" class="box-sub">隐藏 Ref Checkpoint 回滚</text>
+  <text x="1035.0" y="646.5" text-anchor="middle" class="box-sub">解析仓库根目录 t3.json</text>
+  <text x="1035.0" y="666.0" text-anchor="middle" class="box-sub">多仓库追踪与布局审批</text>
+</svg>

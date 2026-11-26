@@ -1,0 +1,175 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 796" width="1200" height="796" role="img" aria-label="agent-loop-core pstack 4 阶段研发流与 T3 Code 13 角色两拍编排">
+  <defs>
+    <style>
+      text { font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans SC", "Segoe UI", sans-serif; }
+      .title { font-size: 19px; font-weight: 700; fill: #172d32; }
+      .subtitle { font-size: 13px; fill: #4f6668; }
+      .hdr { font-size: 13.5px; font-weight: 700; fill: #ffffff; }
+      .hdr-sub { font-size: 11.5px; fill: #e3f0f2; }
+      .pill-text { font-size: 12px; font-weight: 700; fill: #ffffff; }
+      .box-title { font-size: 13.5px; font-weight: 700; fill: #172d32; }
+      .box-sub { font-size: 12px; fill: #4f6668; }
+      .label { font-size: 12.5px; font-weight: 700; fill: #172d32; }
+      .small { font-size: 11.5px; fill: #4f6668; }
+      .code { font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace; font-size: 11px; fill: #172d32; }
+    </style>
+    <marker id="arr" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 1 1.5 L 8.8 5 L 1 8.5 z" fill="#4c686b"/>
+    </marker>
+    <marker id="arr-teal" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 1 1.5 L 8.8 5 L 1 8.5 z" fill="#0b6e67"/>
+    </marker>
+    <marker id="arr-amber" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 1 1.5 L 8.8 5 L 1 8.5 z" fill="#a87624"/>
+    </marker>
+    <marker id="arr-rose" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 1 1.5 L 8.8 5 L 1 8.5 z" fill="#a64538"/>
+    </marker>
+    <marker id="arr-blue" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 1 1.5 L 8.8 5 L 1 8.5 z" fill="#3b6296"/>
+    </marker>
+    <marker id="arr-violet" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 1 1.5 L 8.8 5 L 1 8.5 z" fill="#5d4b8c"/>
+    </marker>
+  </defs>
+  <rect x="0" y="0" width="1200" height="796" fill="#ffffff"/>
+
+  <text x="36" y="40" class="title">agent-loop-core 研发工作流：pstack 4 阶段 / 一站式流水线与 T3 两拍编排</text>
+  <text x="36" y="62" class="subtitle">依托 T3 Code delegate_task 与 t3-routing.json 驱动 13 个分工角色；全程仅设两道人工确认门（Gate 1 / Gate 2）</text>
+  <rect x="36" y="84" width="1128" height="202" rx="12" fill="#f6f9f8" stroke="#4b6d80" stroke-width="1.5"/>
+  <text x="54" y="109" class="box-title" style="fill:#1b3340">宏观流水线：4 阶段独立入口 &amp; 一站式直通（one-stop.md）</text>
+  <rect x="54" y="124" width="188" height="124" rx="10" fill="#edf3fa" stroke="#4b74ab" stroke-width="1.6"/>
+  <path d="M 64 124 H 232 Q 242 124 242 134 V 156 H 54 V 134 Q 54 124 64 124 Z" fill="#3b6296"/>
+  <text x="148.0" y="145" text-anchor="middle" class="hdr">1. 功能查询 / Phase 0</text>
+  <text x="148.0" y="177.5" text-anchor="middle" class="box-sub">严格只读摸底 + 影响面</text>
+  <text x="148.0" y="197.0" text-anchor="middle" class="box-sub">researcher + report-writer</text>
+  <text x="148.0" y="216.5" text-anchor="middle" class="box-sub">产出：docs/inquiries/*.md</text>
+  <text x="148.0" y="236.0" text-anchor="middle" class="box-sub">（可选左源码/右流程 HTML）</text>
+  <rect x="264" y="140" width="92" height="92" rx="10" fill="#fdf5e4" stroke="#c28e34" stroke-width="1.6"/>
+  <text x="310.0" y="161.5" text-anchor="middle" class="box-title" style="fill:#5e410d">Gate 1</text>
+  <text x="310.0" y="181.0" text-anchor="middle" class="box-sub">人工确认</text>
+  <text x="310.0" y="200.5" text-anchor="middle" class="box-sub">需求与范围</text>
+  <text x="310.0" y="220.0" text-anchor="middle" class="box-sub">拍板直通</text>
+  <rect x="378" y="124" width="208" height="124" rx="10" fill="#f2effa" stroke="#7763ad" stroke-width="1.6"/>
+  <path d="M 388 124 H 576 Q 586 124 586 134 V 156 H 378 V 134 Q 378 124 388 124 Z" fill="#5d4b8c"/>
+  <text x="482.0" y="145" text-anchor="middle" class="hdr">2. 方案创建（proposal）</text>
+  <text x="482.0" y="177.5" text-anchor="middle" class="box-sub">architect + web-builder</text>
+  <text x="482.0" y="197.0" text-anchor="middle" class="box-sub">主方案 + 模拟原型 HTML</text>
+  <text x="482.0" y="216.5" text-anchor="middle" class="box-sub">两张架构/变动生图 +</text>
+  <text x="482.0" y="236.0" text-anchor="middle" class="box-sub">5–15 条三层思维导图 Case</text>
+  <rect x="608" y="124" width="208" height="124" rx="10" fill="#e9f5f2" stroke="#168077" stroke-width="1.6"/>
+  <path d="M 618 124 H 806 Q 816 124 816 134 V 156 H 608 V 134 Q 608 124 618 124 Z" fill="#0b6e67"/>
+  <text x="712.0" y="145" text-anchor="middle" class="hdr">3. 功能实现（两拍编排）</text>
+  <text x="712.0" y="177.5" text-anchor="middle" class="box-sub">编码 → 增量编译门前置 →</text>
+  <text x="712.0" y="197.0" text-anchor="middle" class="box-sub">verify.mjs + uicheck →</text>
+  <text x="712.0" y="216.5" text-anchor="middle" class="box-sub">thermos 跨家族双审 →</text>
+  <text x="712.0" y="236.0" text-anchor="middle" class="box-sub">deslop → 离线报告</text>
+  <rect x="838" y="124" width="190" height="124" rx="10" fill="#eef3f5" stroke="#4b6d80" stroke-width="1.6"/>
+  <path d="M 848 124 H 1018 Q 1028 124 1028 134 V 156 H 838 V 134 Q 838 124 848 124 Z" fill="#365668"/>
+  <text x="933.0" y="145" text-anchor="middle" class="hdr">4. 功能合并（merge）</text>
+  <text x="933.0" y="177.5" text-anchor="middle" class="box-sub">架构前后对比图 +</text>
+  <text x="933.0" y="197.0" text-anchor="middle" class="box-sub">按业务链路导读 [重点审阅]</text>
+  <text x="933.0" y="216.5" text-anchor="middle" class="box-sub">偏差回写 + 回归池建议</text>
+  <text x="933.0" y="236.0" text-anchor="middle" class="box-sub">PR / Commit 草稿</text>
+  <rect x="1050" y="140" width="96" height="92" rx="10" fill="#fdf5e4" stroke="#c28e34" stroke-width="1.6"/>
+  <text x="1098.0" y="161.5" text-anchor="middle" class="box-title" style="fill:#5e410d">Gate 2</text>
+  <text x="1098.0" y="181.0" text-anchor="middle" class="box-sub">人工审阅</text>
+  <text x="1098.0" y="200.5" text-anchor="middle" class="box-sub">确认迁回归</text>
+  <text x="1098.0" y="220.0" text-anchor="middle" class="box-sub">再提交合并</text>
+  <line x1="242" y1="186" x2="264" y2="186" stroke="#3b6296" stroke-width="1.8" marker-end="url(#arr-blue)"/>
+  <line x1="356" y1="186" x2="378" y2="186" stroke="#a87624" stroke-width="1.8" marker-end="url(#arr-amber)"/>
+  <line x1="586" y1="186" x2="608" y2="186" stroke="#5d4b8c" stroke-width="1.8" marker-end="url(#arr-violet)"/>
+  <line x1="816" y1="186" x2="838" y2="186" stroke="#0b6e67" stroke-width="1.8" marker-end="url(#arr-teal)"/>
+  <line x1="1028" y1="186" x2="1050" y2="186" stroke="#365668" stroke-width="1.8" marker-end="url(#arr)"/>
+  <path d="M 378 256 V 267 H 1028 V 256" fill="none" stroke="#0b6e67" stroke-width="1.6"/>
+  <rect x="498" y="257" width="410" height="20" rx="4" fill="#f6f9f8"/>
+  <text x="703" y="271" text-anchor="middle" font-size="11.5" font-weight="700" style="fill:#0b6e67">一站式自动贯通段（仅契约变更 / 同错2轮止损 / 环境阻断时打断）</text>
+  <rect x="36" y="304" width="1128" height="346" rx="12" fill="#ffffff" stroke="#0b6e67" stroke-width="1.8"/>
+  <rect x="54" y="318" width="434" height="26" rx="13.0" fill="#0b6e67"/>
+  <text x="271.0" y="335.3" text-anchor="middle" class="pill-text">阶段 3 放大镜：T3 Code 两拍多 Agent 编排与异构模型分工</text>
+  <text x="506" y="336" class="small">所有子任务均通过 delegate_task 派发，遵循零父历史传递与产物落盘</text>
+  <rect x="54" y="358" width="398" height="274" rx="10" fill="#edf3fa" stroke="#4b74ab" stroke-width="1.3" stroke-dasharray="5 4"/>
+  <text x="70" y="381" class="label" style="fill:#1c385c">第一拍：编码 + 编译静态门前置（防无效扇出烧 Token）</text>
+  <rect x="68" y="396" width="178" height="92" rx="10" fill="#edf3fa" stroke="#4b74ab" stroke-width="1.6"/>
+  <text x="157.0" y="417.5" text-anchor="middle" class="box-title" style="fill:#1c385c">coder-simple</text>
+  <text x="157.0" y="437.0" text-anchor="middle" class="box-sub">常规 / 单模块编码</text>
+  <text x="157.0" y="456.5" text-anchor="middle" class="box-sub">codex/gpt-6.2-sol</text>
+  <text x="157.0" y="476.0" text-anchor="middle" class="box-sub">reasoningEffort: medium</text>
+  <rect x="68" y="502" width="178" height="92" rx="10" fill="#f2effa" stroke="#7763ad" stroke-width="1.6"/>
+  <text x="157.0" y="523.5" text-anchor="middle" class="box-title" style="fill:#352859">coder-complex</text>
+  <text x="157.0" y="543.0" text-anchor="middle" class="box-sub">状态机 / 并发 / 迁移</text>
+  <text x="157.0" y="562.5" text-anchor="middle" class="box-sub">codex/gpt-6.2-astra</text>
+  <text x="157.0" y="582.0" text-anchor="middle" class="box-sub">xhigh · 并行 worktree</text>
+  <rect x="274" y="436" width="162" height="118" rx="10" fill="#fdf5e4" stroke="#c28e34" stroke-width="1.6"/>
+  <text x="355.0" y="460.8" text-anchor="middle" class="box-title" style="fill:#5e410d">tool-runner（编译门）</text>
+  <text x="355.0" y="480.2" text-anchor="middle" class="box-sub">路径裁剪增量检查</text>
+  <text x="355.0" y="499.8" text-anchor="middle" class="box-sub">check:changed / arch</text>
+  <text x="355.0" y="519.2" text-anchor="middle" class="box-sub">codex/gpt-6.1-terra</text>
+  <text x="355.0" y="538.8" text-anchor="middle" class="box-sub">effort: low</text>
+  <line x1="246" y1="442" x2="274" y2="474" stroke="#3b6296" stroke-width="1.8" marker-end="url(#arr-blue)"/>
+  <line x1="246" y1="548" x2="274" y2="514" stroke="#5d4b8c" stroke-width="1.8" marker-end="url(#arr-violet)"/>
+  <path d="M 355 554 V 614 H 157 V 594" fill="none" stroke="#a64538" stroke-width="1.8" stroke-dasharray="5 4" marker-end="url(#arr-rose)"/>
+  <rect x="185.4" y="597.5" width="169.2" height="17" rx="4" fill="#ffffff" opacity="0.95"/>
+  <text x="270.0" y="610.0" text-anchor="middle" class="small" style="fill:#a64538;font-weight:600">失败打回（连卡 2 轮止损）</text>
+  <rect x="476" y="358" width="670" height="274" rx="10" fill="#e9f5f2" stroke="#168077" stroke-width="1.3" stroke-dasharray="5 4"/>
+  <text x="492" y="381" class="label" style="fill:#0c4742">第二拍：过编译门后并行扇出验收 + 跨家族双路评审 + 精简复验</text>
+  <rect x="492" y="396" width="172" height="94" rx="10" fill="#e9f5f2" stroke="#168077" stroke-width="1.6"/>
+  <text x="578.0" y="418.5" text-anchor="middle" class="box-title" style="fill:#0c4742">behavior-tester</text>
+  <text x="578.0" y="438.0" text-anchor="middle" class="box-sub">写 verify.mjs（禁单测）</text>
+  <text x="578.0" y="457.5" text-anchor="middle" class="box-sub">覆盖 F01..Fn 真实行为</text>
+  <text x="578.0" y="477.0" text-anchor="middle" class="box-sub">codex/gpt-6.2-sol</text>
+  <rect x="492" y="506" width="172" height="94" rx="10" fill="#e9f5f2" stroke="#168077" stroke-width="1.6"/>
+  <text x="578.0" y="528.5" text-anchor="middle" class="box-title" style="fill:#0c4742">ui-tester（有 UI 时）</text>
+  <text x="578.0" y="548.0" text-anchor="middle" class="box-sub">preview_* 实机操作</text>
+  <text x="578.0" y="567.5" text-anchor="middle" class="box-sub">采集截图 + uicheck</text>
+  <text x="578.0" y="587.0" text-anchor="middle" class="box-sub">codex/gpt-6.1-terra</text>
+  <rect x="690" y="396" width="186" height="94" rx="10" fill="#edf3fa" stroke="#4b74ab" stroke-width="1.6"/>
+  <text x="783.0" y="418.5" text-anchor="middle" class="box-title" style="fill:#1c385c">reviewer-correctness</text>
+  <text x="783.0" y="438.0" text-anchor="middle" class="box-sub">thermos 正确性只读审</text>
+  <text x="783.0" y="457.5" text-anchor="middle" class="box-sub">状态/并发/恢复/缺口</text>
+  <text x="783.0" y="477.0" text-anchor="middle" class="box-sub">codex/gpt-6.2-astra</text>
+  <rect x="690" y="506" width="186" height="94" rx="10" fill="#f2effa" stroke="#7763ad" stroke-width="1.6"/>
+  <text x="783.0" y="528.5" text-anchor="middle" class="box-title" style="fill:#352859">reviewer-maintainability</text>
+  <text x="783.0" y="548.0" text-anchor="middle" class="box-sub">thermos 可维护性只读审</text>
+  <text x="783.0" y="567.5" text-anchor="middle" class="box-sub">跨模型家族互补视角</text>
+  <text x="783.0" y="587.0" text-anchor="middle" class="box-sub">antigravity/opus-5-5</text>
+  <rect x="902" y="396" width="228" height="94" rx="10" fill="#fdf5e4" stroke="#c28e34" stroke-width="1.6"/>
+  <text x="1016.0" y="418.5" text-anchor="middle" class="box-title" style="fill:#5e410d">coordinator + deslopper</text>
+  <text x="1016.0" y="438.0" text-anchor="middle" class="box-sub">逐条核实双审（≤3处自改）</text>
+  <text x="1016.0" y="457.5" text-anchor="middle" class="box-sub">deslopper 清理冗余代码</text>
+  <text x="1016.0" y="477.0" text-anchor="middle" class="box-sub">terra / sol · low</text>
+  <rect x="902" y="506" width="228" height="94" rx="10" fill="#eef3f5" stroke="#4b6d80" stroke-width="1.6"/>
+  <text x="1016.0" y="528.5" text-anchor="middle" class="box-title" style="fill:#1b3340">最终复验 → 离线报告</text>
+  <text x="1016.0" y="548.0" text-anchor="middle" class="box-sub">npm run report -- record</text>
+  <text x="1016.0" y="567.5" text-anchor="middle" class="box-sub">沉淀 report/index.html</text>
+  <text x="1016.0" y="587.0" text-anchor="middle" class="box-sub">（三层思维导图验收树）</text>
+  <line x1="436" y1="494" x2="492" y2="444" stroke="#0b6e67" stroke-width="1.8" marker-end="url(#arr-teal)"/>
+  <rect x="444.8" y="443.5" width="38.4" height="17" rx="4" fill="#ffffff" opacity="0.94"/>
+  <text x="464.0" y="456.0" text-anchor="middle" class="small" style="fill:#0b6e67;font-weight:600">通过</text>
+  <line x1="436" y1="494" x2="492" y2="552" stroke="#0b6e67" stroke-width="1.8" marker-end="url(#arr-teal)"/>
+  <line x1="664" y1="443" x2="690" y2="443" stroke="#4c686b" stroke-width="1.8" marker-end="url(#arr)"/>
+  <line x1="664" y1="553" x2="690" y2="553" stroke="#4c686b" stroke-width="1.8" marker-end="url(#arr)"/>
+  <line x1="876" y1="443" x2="902" y2="443" stroke="#3b6296" stroke-width="1.8" marker-end="url(#arr-blue)"/>
+  <line x1="876" y1="553" x2="902" y2="464" stroke="#5d4b8c" stroke-width="1.8" marker-end="url(#arr-violet)"/>
+  <line x1="1016" y1="490" x2="1016" y2="506" stroke="#0b6e67" stroke-width="1.8" marker-end="url(#arr-teal)"/>
+  <rect x="36" y="668" width="1128" height="106" rx="12" fill="#fdf5e4" stroke="#c28e34" stroke-width="1.5"/>
+  <text x="54" y="692" class="box-title" style="fill:#5e410d">t3-routing.json 六大防烧 Token 护栏与不可用兜底（guardrails + fallback）</text>
+  <rect x="54" y="704" width="174" height="56" rx="8" fill="#eef3f5" stroke="#4b6d80" stroke-width="1.6"/>
+  <text x="141.0" y="727.0" text-anchor="middle" class="box-title" style="fill:#1b3340">① 单次能力探测</text>
+  <text x="141.0" y="746.5" text-anchor="middle" class="box-sub">每线程首次调 capabilities</text>
+  <rect x="238" y="704" width="174" height="56" rx="8" fill="#eef3f5" stroke="#4b6d80" stroke-width="1.6"/>
+  <text x="325.0" y="727.0" text-anchor="middle" class="box-title" style="fill:#1b3340">② 零父历史传递</text>
+  <text x="325.0" y="746.5" text-anchor="middle" class="box-sub">仅传 commit/路径/目标/格式</text>
+  <rect x="422" y="704" width="174" height="56" rx="8" fill="#eef3f5" stroke="#4b6d80" stroke-width="1.6"/>
+  <text x="509.0" y="727.0" text-anchor="middle" class="box-title" style="fill:#1b3340">③ 编译门前置</text>
+  <text x="509.0" y="746.5" text-anchor="middle" class="box-sub">静态不绿绝不扇出验收评审</text>
+  <rect x="606" y="704" width="174" height="56" rx="8" fill="#eef3f5" stroke="#4b6d80" stroke-width="1.6"/>
+  <text x="693.0" y="727.0" text-anchor="middle" class="box-title" style="fill:#1b3340">④ ≤3 处小修自改</text>
+  <text x="693.0" y="746.5" text-anchor="middle" class="box-sub">主会话直修，不新派编码工</text>
+  <rect x="790" y="704" width="174" height="56" rx="8" fill="#eef3f5" stroke="#4b6d80" stroke-width="1.6"/>
+  <text x="877.0" y="727.0" text-anchor="middle" class="box-title" style="fill:#1b3340">⑤ 同错 2 轮止损</text>
+  <text x="877.0" y="746.5" text-anchor="middle" class="box-sub">停下回主会话查共同前提</text>
+  <rect x="974" y="704" width="172" height="56" rx="8" fill="#eef3f5" stroke="#4b6d80" stroke-width="1.6"/>
+  <text x="1060.0" y="727.0" text-anchor="middle" class="box-title" style="fill:#1b3340">⑥ 落盘 + 自动回落</text>
+  <text x="1060.0" y="746.5" text-anchor="middle" class="box-sub">大产物写盘；不可用回落父模型</text>
+</svg>
