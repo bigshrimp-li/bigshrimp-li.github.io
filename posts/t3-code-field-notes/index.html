@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>T3 Code：多设备编程与多 Agent 工作流实践 · bigshrimp-li</title>
+  <meta name="description" content="两周使用记录：用手机接着电脑上的任务，给不同的 Agent 分工，再用固定工作流串起复现、审批、修复和验证。">
+  <link rel="stylesheet" href="../../style.css">
+  <link rel="stylesheet" href="article.css">
+  <script defer src="contents.js"></script>
+</head>
+<body class="note" id="top">
+  <header class="masthead">
+    <a href="../../">bigshrimp-li 的个人博客</a>
+    <span>技术笔记</span>
+  </header>
+  <main class="shell">
+    <div class="title-block">
+      <div class="byline">使用笔记 <time datetime="2026-11-26">2026.11.26</time></div>
+      <h1 id="article-title">T3 Code</h1>
+      <p class="deck">多设备编程与多 Agent 工作流实践</p>
+    </div>
+    <aside class="chapters">
+      <details open>
+        <summary>文章目录</summary>
+        <nav aria-label="文章目录">
+            <a class="depth-2" href="#scenarios">场景介绍</a>
+            <a class="depth-3" href="#native-agents">原生 Agent 兼容</a>
+            <a class="depth-3" href="#devices">多设备同步</a>
+            <a class="depth-3" href="#custom-workflows">工作流定制</a>
+            <a class="depth-3" href="#github">GitHub</a>
+            <a class="depth-3" href="#concepts">核心对象</a>
+            <a class="depth-2" href="#features">核心功能</a>
+            <a class="depth-3" href="#delegation">动态 Agent 委派</a>
+            <a class="depth-3" href="#fixed-workflow">固定工作流</a>
+            <a class="depth-2" href="#practice">个人实践</a>
+            <a class="depth-3" href="#playbooks">工作流</a>
+            <a class="depth-3" href="#role-routing">角色异构</a>
+        </nav>
+      </details>
+    </aside>
+    <article class="prose" aria-labelledby="article-title">
+<p class="source-indent">最近 T3 Code 在 X 上很火，个人体验了两周，效果确实很惊艳。主要场景通过手机控制家里电脑，多个订阅组合开发，提升 Antigravity 的体验等。通过这款软件也认识一个新名词：ADE（Agentic Development Environment），体验上确实比 Codex、Claude Code、DSH 好不少。参考这个思路，我认为未来会有企业级别的 ADE 产品，真正帮助企业提效，推动企业开发效率。</p>
+<p class="source-indent">但是 T3 Code 的作者最近也挖出后台数据收集，在 X 上有不少针对华人和中文区歧视的言论，大家根据需求看是否使用。类似的软件还有：Orca（国人作者）、Paseo、Herdr（命令行）等。</p>
+<h2 id="scenarios">场景介绍</h2>
+<p class="source-indent">T3 Code 是一个基于编码 Agent，针对编码场景进一步集成了多设备、原生调试、Git 工作树（Git worktree）隔离等能力的编码工具。最近个人编码全面迁移到 T3 Code，尤其针对以下场景效率和体验提升非常多。</p>
+<h3 id="native-agents">原生 Agent 兼容</h3>
+<p class="source-indent">T3 Code 不自建 Agent Harness，而是基于各种成熟的 Harness 环境（例如 Codex、Claude Code）进行编码。可以做到一个工具同时切换不同的 Harness 环境，通过这种方式可以做到：</p>
+<ol><li>账号沿用所选厂商支持的授权方式，遵从各类编码订阅计划的协议，避免封号</li><li>部分模型订阅可以直接跨 Harness 使用，避免频繁配置，例如 OpenRouter 里面订阅的 DeepSeek 可以用于各个 Harness</li><li>一个软件界面可以同时操作多种 Harness，避免频繁的软件切换。</li></ol>
+<figure><a href="assets/native-agent.webp" aria-label="查看原图：T3 Code 中的会话和变更，以及原生 Agent 的执行过程"><img src="assets/native-agent.webp" alt="T3 Code 中的会话和变更，以及原生 Agent 的执行过程" loading="lazy" decoding="async" width="1672" height="941"></a><figcaption>T3 Code 展示会话与变更，原生 Agent 负责执行。</figcaption></figure>
+<h3 id="devices">多设备同步</h3>
+<p class="source-indent">手机和电脑都可以连接任一已配对、可达的环境，直接给其中的 Agent 下达指令。例如，在电脑上向开发机提交全量回归，离开工位后用手机打开同一线程，批准待执行的命令，回到电脑即可查看这次审批和后续测试结果。整个过程共用一份服务端记录，执行主机保持在线即可持续工作。</p>
+<figure><a href="assets/devices.webp" aria-label="查看原图：手机、电脑与已配对执行主机的连接关系"><img src="assets/devices.webp" alt="手机、电脑与已配对执行主机的连接关系" loading="lazy" decoding="async" width="1536" height="1024"></a><figcaption>左侧选择从哪台设备操作，右侧选择由哪台机器执行。本机电脑可以同时承担交互和执行。</figcaption></figure>
+<h3 id="custom-workflows">工作流定制</h3>
+<p class="source-indent">工作流按角色分配模型和 Harness（运行模型并调用工具的编码客户端）。完美适配有多个编码工具订阅的用户，可以根据模型成本、Harness 能力按需切换。如下图，是我个人根据 pstack 改造的一个迭代工作流。</p>
+<figure><a href="assets/workflow-roles.webp" aria-label="查看原图：从拆分任务、编码，到静态检查、并行测试、双路评审和交付的角色流程"><img src="assets/workflow-roles.webp" alt="从拆分任务、编码，到静态检查、并行测试、双路评审和交付的角色流程" loading="lazy" decoding="async" width="2560" height="2560"></a></figure>
+<div class="table-scroll" role="region" tabindex="0" aria-label="迭代工作流的角色与职责"><table><colgroup><col style="width:24.32%"><col style="width:41.22%"><col style="width:17.97%"><col style="width:16.49%"></colgroup><thead><tr><th scope="col"><p>角色</p></th><th scope="col"><p>职责</p></th><th scope="col"><p>模型</p></th><th scope="col"><p>Harness</p></th></tr></thead><tbody><tr><td><p>coordinator</p></td><td><p>读取方案，拆出改动范围和验收条件。</p></td><td><p>Opus 5.5</p></td><td><p>Claude Code</p></td></tr><tr><td><p>coder</p></td><td><p>实现变更并生成产物，接收编译失败和评审退回的修改。</p></td><td><p>Gemini 4 Neon</p></td><td><p>Antigravity</p></td></tr><tr><td><p>tool-runner</p></td><td><p>先做增量静态检查和编译。交付前复验并生成离线报告。</p></td><td><p>GPT-6.1 Terra</p></td><td><p>Codex</p></td></tr><tr><td><p>behavior-tester</p></td><td><p>编写并运行 verify.mjs，验证关键行为。</p></td><td><p>GPT-6.1 Terra</p></td><td><p>Codex</p></td></tr><tr><td><p>ui-tester</p></td><td><p>涉及界面变更时运行 uicheck，核对交互与显示。</p></td><td><p>GPT-6.1 Terra</p></td><td><p>Codex</p></td></tr><tr><td><p>reviewer-correctness</p></td><td><p>独立只读评审，检查行为、边界条件和回归风险。</p></td><td><p>GPT-6.2 Astra</p></td><td><p>Codex</p></td></tr><tr><td><p>reviewer-maintainability</p></td><td><p>独立只读评审，检查模块职责、重复逻辑和维护成本。</p></td><td><p>GPT-6.2 Astra</p></td><td><p>Codex</p></td></tr><tr><td><p>主会话</p></td><td><p>核实两路评审意见。小修自行处理，大修交回 coder。</p></td><td><p>Opus 5.5</p></td><td><p>Claude Code</p></td></tr><tr><td><p>deslopper</p></td><td><p>清理本次 diff 中的冗余改动，交给 tool-runner 复验。</p></td><td><p>GPT-6.1 Terra</p></td><td><p>Codex</p></td></tr></tbody></table></div>
+<h3 id="github">GitHub</h3>
+<p class="source-indent">T3 Code 可直接与你 GitHub 账号接通，接通后 Agent 可直接处理工单。</p>
+<ul><li><strong>Webhook 推送</strong>。GitHub 在创建 Issue 或 PR 时通知 T3 Code，按预设规则启动修复或代码审查。</li><li><strong>定时轮询</strong>。可配置固定时间查询一次 GitHub，发现工作流启用后新建的 Issue 或 PR。Issue 可按标签筛选。</li><li><strong>PR Watch</strong>。检查 PR。CI 失败、他人提交评审意见或出现合并冲突时，原线程中的 Agent 会继续跟进。</li></ul>
+<figure><a href="assets/github.webp" aria-label="查看原图：GitHub 与 T3 Code 之间的工单触发和 PR 状态跟进"><img src="assets/github.webp" alt="GitHub 与 T3 Code 之间的工单触发和 PR 状态跟进" loading="lazy" decoding="async" width="1536" height="1024"></a><figcaption>GitHub 与 T3 Code</figcaption></figure>
+<h3 id="concepts">核心对象</h3>
+<p class="source-indent">下面介绍 T3 Code 中的核心概念：</p>
+<div class="table-scroll" role="region" tabindex="0" aria-label="T3 Code 核心对象"><table><colgroup><col style="width:17.82%"><col style="width:30.16%"><col style="width:32.33%"><col style="width:19.69%"></colgroup><thead><tr><th scope="col"><p><strong>概念</strong></p></th><th scope="col"><p><strong>定义</strong></p></th><th scope="col"><p><strong>说明</strong></p></th><th scope="col"><p>举例</p></th></tr></thead><tbody><tr><td><p>Environment（环境）</p></td><td><p>一个运行中的 T3 Code 服务端及其可访问的机器资源。</p></td><td><p>维护本机的项目、凭据和持久状态。更换网络地址后仍可连接同一环境。</p></td><td><p>Mac，开发机</p></td></tr><tr><td><p>Project（项目）</p></td><td><p>环境内登记的开发项目，以文件系统目录为根。</p></td><td><p>一个环境可以登记多个项目。项目根目录、默认设置和线程均由该环境管理。</p></td><td><p>一个 GitHub 仓库</p></td></tr><tr><td><p>Workspace（工作目录）</p></td><td><p>线程实际读取、编辑文件和运行命令的目录。</p></td><td><p>可以是项目当前检出，也可以是独立的 Git 工作树。共享同一检出的线程可以看到彼此未提交的改动。</p></td><td><p>一个 GitHub 仓库的一个 Git 工作树分支</p></td></tr><tr><td><p>Thread（线程）</p></td><td><p>T3 Code 为一项任务维护的持久记录。</p><p></p></td><td><p>保存消息、执行轮次、审批和工单或 PR 关联。关闭客户端、停止原生会话或更换提供方后，线程身份仍可保留。</p></td><td><p>一个对话，需要注意，在 T3 Code 这个会话可以对应多个集成 Agent 的对话</p></td></tr><tr><td><p>Turn（执行轮次）</p></td><td><p>T3 Code 从一次任务输入开始跟踪的一次执行。</p></td><td><p>同一线程包含多轮执行。Codex 在 /goal 模式下可以自行开始下一个原生执行轮次，T3 Code 可将多个原生执行轮次归入同一 run。</p></td><td><p>用户一次请求后面连带出来的多轮模型调用和工具调用</p></td></tr><tr><td><p>Provider session（Agent 会话）</p></td><td><p>T3 Code 通过适配器打开、恢复或停止的提供方运行时会话。</p></td><td><p>原生会话标识与 T3 Code 线程标识分别管理。能否恢复历史、接受中途输入或回退，取决于提供方的协议和能力。</p></td><td><p>Codex 的一个会话</p></td></tr></tbody></table></div>
+<p>线程隔离的是对话记录，Git 工作树隔离的是检出文件。两条线程指向同一工作目录时，消息历史独立，文件修改彼此可见。即使使用独立 Git 工作树，端口、数据库和外部服务仍可能共享。</p>
+<h2 id="features">核心功能</h2>
+<p class="source-indent">T3 Code 最吸引重度工程用户的能力，并不是“同时开十个聊天框”，而是让一个主 Agent（例如 Claude Code 或 Antigravity）在执行任务的过程中，<strong>按需把子任务精准派发给另一个提供方（Provider）、另一种模型、另一档思考预算、一个全新隔离的 Git 工作树，甚至远端另一台 VPS 机器</strong>，并在所有子任务结束后自动被唤醒汇总。当前 T3 Code 一共支持以下几种多 Agent 机制：</p>
+<ul><li><strong>动态 Agent 委派</strong>：流程由大模型临场规划，适合探索性研发任务；但步骤顺序不固定，遇到跨天等待或进程重启很难保证精确续跑。</li><li><strong>固定工作流</strong>：面向<strong>高确定性、长周期、不可丢进度、不可重复产生副作用</strong>的多阶段流水线（例如 <code>Issue 触发 → Agent 复现 → 人工拍板 → Worktree 修复 → 等待 CI → 自动合并 → 销毁临时机器</code>）。</li></ul>
+<h3 id="delegation">动态 Agent 委派</h3>
+<p class="source-indent">下图是一个动态 Agent 编排的实际流程，Orchestrator 是主要的消息路由组件。</p>
+<figure><a href="assets/delegation.webp" aria-label="查看原图：Orchestrator 在主 Agent 与子 Agent 之间路由任务和结果"><img src="assets/delegation.webp" alt="Orchestrator 在主 Agent 与子 Agent 之间路由任务和结果" loading="lazy" decoding="async" width="1200" height="810"></a></figure>
+<p>动态编排的实现主要依靠 T3 Code 向各个 Agent 注入相关 MCP 工具实现，工具职责如下：</p>
+<div class="table-scroll" role="region" tabindex="0" aria-label="Agent 编排工具及约束"><table><colgroup><col style="width:19.85%"><col style="width:34.74%"><col style="width:45.41%"></colgroup><thead><tr><th scope="col"><p><strong>编排原语 / 工具组</strong></p></th><th scope="col"><p><strong>核心职责</strong></p></th><th scope="col"><p><strong>关键约束（防误用红线）</strong></p></th></tr></thead><tbody><tr><td><p><code>delegate_task</code> / <code>task_cancel</code></p></td><td><p>派发受控子任务、级联中止子孙任务。</p><p></p></td><td><p>新评审或复查必开新 <code>delegate_task</code>，禁止向旧子线程发 <code>t3_thread_send</code>；停止子任务必用 <code>task_cancel</code>，禁止直接 <code>t3_thread_interrupt</code>。</p></td></tr><tr><td><p><code>t3_thread_launch</code> / <code>create_threads</code></p></td><td><p>创建新的顶层独立线程（支持指定 <code>workspaceStrategy</code>）。</p></td><td><p><strong>仅在用户明确要求“开新线程”时使用</strong>，“subagent / delegate / parallel”绝不等于开顶层线程。</p></td></tr><tr><td><p><code>t3_thread_transfer</code></p></td><td><p>在线程之间做上下文 <code>fork</code> 或 <code>merge_back</code>。</p></td><td><p>默认从 <code>latest_stable</code> 稳定点复制上下文，不自动开跑新 Turn。</p></td></tr><tr><td><p><code>watch_pull_request</code></p></td><td><p>持续监听 PR 的 CI 失败/必检通过/新评审/冲突并唤醒线程。</p></td><td><p>子 Agent 无权开启 PR Watch，必须由父线程统一看管；一次开启持续生效，唤醒不是自动合并授权。</p></td></tr><tr><td><p><code>schedule_task</code></p></td><td><p>创建单提示词的定时（interval/fixed_time/once）或 Webhook 任务。</p></td><td><p>Webhook URL 仅创建时返回一次，适合单轮定期动作；多阶段状态流转请用固定工作流。</p></td></tr><tr><td><p><code>request_secret</code></p></td><td><p>向用户弹出安全单行卡片收集密码/Token/sudo，返回一次性 <code>secretRef</code> 或临时文件。</p></td><td><p>凭据不进入聊天记录，不落入模型上下文。</p></td></tr></tbody></table></div>
+<p class="source-indent">具体的 Agent 对象也可以开发者自行定义，并且通过 Skill 注入到核心提示词中。最后个人实践会有详细介绍。</p>
+<h3 id="fixed-workflow">固定工作流</h3>
+<p class="source-indent">固定工作流则主要依赖固定的 TypeScript 脚本实现，全程通过 SQLite 记录工作流执行进度，保证任务可恢复。</p>
+<p class="source-indent">下面用一个覆盖 <code>issues.opened</code>、<code>within</code> 并发池、<code>agent</code>（带强类型 <code>returns</code>）、<code>ask</code> 人工审批、<code>pullRequests.wait</code> 与 <code>onEnd</code> 的真实范例，走一遍重放引擎的全链路状态跳变：</p>
+<pre tabindex="0" aria-label="固定工作流 TypeScript 示例代码"><code class="language-typescript">const { workflow, title, subject, agent, ask, step, within, stop, issues, pullRequests, Issue } = T3;
+
+const Repro = Schema.Struct({
+  reproduced: Schema.Boolean,
+  rootCause: Schema.String,
+});
+const FixPr = Schema.Struct({ prUrl: Schema.String });
+
+export default workflow(
+  "issue-autopilot",
+  {
+    version: 1,
+    payload: Issue,
+    concurrency: 4,
+    asks: { approveFix: "批准自动修复？" },
+    triggers: [issues.opened({ project: "/home/dev/app", labels: ["bug"] })],
+    onEnd: (issue, end) =&gt;
+      issues.comment(issue, `流水线 ${end.id} 结束：${end.outcome} ${end.reason ?? ""}`),
+  },
+  Effect.fn(function* (issue) {
+    yield* title(`${issue.displayKey} ${issue.title}`);
+    yield* subject(issue);
+
+    // 1. 只读复现（返回强类型 Repro，自动链接 Issue）
+    const repro = yield* agent("reproduce", {
+      project: "/home/dev/app",
+      issue,
+      brief: `只读复现 ${issue.url}，严禁修改文件，定位根因后提交结果。`,
+      returns: Repro,
+      timeout: "30 minutes",
+    });
+    if (!repro.value.reproduced) return yield* stop("未能稳定复现");
+
+    // 2. 人工拍板（进入 Needs you 收件箱，最多等 2 天）
+    const decision = yield* ask("approve", {
+      kind: "approveFix",
+      title: `已复现 ${issue.displayKey}，是否派 Agent 在 Worktree 修复？`,
+      choices: ["fix", "hold"],
+      data: repro.value,
+      timeout: "2 days",
+    });
+    if (Option.isNone(decision) || decision.value.choice !== "fix") {
+      return yield* stop("人工暂缓修复");
+    }
+
+    // 3. 受并发池限流（最多 2 个构建同时跑）在隔离 Worktree 修复并提 PR
+    const pr = yield* within(
+      "builders",
+      { limit: 2 },
+      agent("fix", {
+        project: "/home/dev/app",
+        workspace: { type: "worktree", baseRef: "origin/main", startFromOrigin: true },
+        runtimeMode: "full-access",
+        brief: `基于根因「${repro.value.rootCause}」修复 ${issue.url}，通过测试并开 PR。`,
+        returns: FixPr,
+        timeout: "2 hours",
+      }),
+    );
+
+    // 4. 挂起等待 PR Checks 落停（可跨数小时，重启不丢）
+    const standing = yield* pullRequests.wait(
+      "ci",
+      { project: "/home/dev/app", url: pr.value.prUrl },
+      { until: "checks", timeout: "2 hours" },
+    );
+    if (Option.isNone(standing) || standing.value.state !== "open" || standing.value.checks !== "passing") {
+      return yield* stop("CI 未通过或 PR 已关闭");
+    }
+
+    // 5. 确定性代码合并（step 默认 0 重试防重复操作）
+    yield* step("merge", { returns: Schema.Void }, pullRequests.act({ project: "/home/dev/app", url: pr.value.prUrl }, "merge"));
+    return { mergedPr: pr.value.prUrl };
+  }),
+);</code></pre>
+<p>将其执行流程可视化如下：</p>
+<figure><a href="assets/workflow-replay.webp" aria-label="查看原图：Issue 触发固定工作流后，复现、人工审批、修复、等待检查和合并的执行过程"><img src="assets/workflow-replay.webp" alt="Issue 触发固定工作流后，复现、人工审批、修复、等待检查和合并的执行过程" loading="lazy" decoding="async" width="1200" height="770"></a></figure>
+<h2 id="practice">个人实践</h2>
+<p class="source-indent">最近研发流程受到 pstack 启发，相比之前主要优化了三点：</p>
+<ol><li>用代码沉淀足够多的 lint 规则，保证 UI 与设计一致，代码架构稳定和代码风格不腐化</li><li>通过不同 Agent 分工合作，让人能尽可能理解与掌控 AI 的代码变更，降低人的注意力。主要包括：<ol type="a"><li>带原型和架构变更点的设计方案，设定模板的交付文档</li><li>对代码变更的 lint 检查结果，UI 产物的差别对比，性能分析结果</li><li>实际测试的执行快照</li></ol></li><li>通过剧本组合 Skill，规范日常核心场景迭代流程。<p>基于 T3 Code 提供的原生多 Agent 编排与 pstack 提供的软件开发迭代思路，我们沉淀出了以下工作流</p></li></ol>
+<h3 id="playbooks">工作流</h3>
+<p>通过统一的一个 Skill 入口暴露：<strong>4 </strong><strong>个主</strong><strong>流程 + 1 条</strong><strong>组合</strong><strong>流水线</strong>，并将所有研发文档交付物规范落盘到 <code>docs/</code>：</p>
+<div class="table-scroll" role="region" tabindex="0" aria-label="开发剧本与交付物"><table><colgroup><col style="width:15.78%"><col style="width:24.22%"><col style="width:27.56%"><col style="width:32.44%"></colgroup><thead><tr><th scope="col"><p>阶段 / 剧本</p></th><th scope="col"><p>边界与核心纪律</p></th><th scope="col"><p>标准交付物与落位</p></th><th scope="col"><p>关键质量机制</p></th></tr></thead><tbody><tr><td><p><strong>1. 功能查询</strong><br><code>1-inquiry.md</code></p></td><td><p><strong>严格只读</strong>，零业务代码改动，固定 commit 基线，历史原因按需追查。</p></td><td><p><code>docs/inquiries/YYYY-MM-DD-&lt;topic&gt;.md</code>（明确要求时出离线 HTML）</p></td><td><p>强制包含 1 个端到端具体例子、架构/流程图与 <code>[源码]</code> 行号证据；HTML 必带“左源码 / 右流程点击直达”。</p></td></tr><tr><td><p><strong>2. 方案创建</strong><br><code>2-proposal.md</code></p></td><td><p>不区分新功能与 Bug；<strong>先查后聊、迭代收敛</strong>，严禁跳过确认直接编码。</p></td><td><p><code>docs/requirements/&lt;topic&gt;/README.md</code> + <code>prototype/index.html</code> + <code>assets/</code></p></td><td><p>离线原型必须标明 <code>[模拟交互]</code> 且右区透视后端状态/DB/日志；<strong>功能验收 Case 用三层思维导图组织（5–15 条可控可审计）</strong>。</p></td></tr><tr><td><p><strong>3. 功能实现</strong><br><code>3-implementation.md</code></p></td><td><p>按已确认方案编码，偏差必须登记回写；严守 <strong><code>X-TEST-01</code></strong><strong> 禁函数级单元测试</strong>。</p></td><td><p>代码变更 + <code>verify.mjs</code> + <code>report/index.html</code> 离线报告</p></td><td><p><strong>T3 两拍编排</strong>：先过路径裁剪增量编译门，再并行扇出 <code>verify.mjs</code>/<code>uicheck</code>、<code>thermos</code> 跨家族双路评审与 <code>deslop</code> 精简。</p></td></tr><tr><td><p><strong>4. 功能合并</strong><br><code>4-merge.md</code></p></td><td><p>帮助人类无黑盒审阅 AI 改动；<strong>停在确认门，未经人工拍板禁止迁脚本或合并</strong>。</p></td><td><p><code>docs/requirements/&lt;topic&gt;/merge-guide.md</code> + <code>assets/architecture-diff.png</code></p></td><td><p>禁止按文件名流水账罗列 diff，必须按“入口 → 裁决 → 持久化 → 适配”串讲并标 <code>[重点审阅]</code>，逐条给出回归池沉淀建议。</p></td></tr><tr><td><p><strong>一站式开发</strong><br><code>one-stop.md</code></p></td><td><p>把 2 → 3 → 4 串为自动贯通流水线，全程只设 <strong>Gate 1（需求确认）</strong>与 <strong>Gate 2（合并确认）</strong>。</p></td><td><p>贯通交付方案/原型、代码、<code>verify.mjs</code>、离线报告与合并导读</p></td><td><p>仅在 3 种例外下中途打断：需改外部契约、同错连卡 2 轮止损、遇不可逆或环境阻断。</p></td></tr></tbody></table></div>
+<h3 id="role-routing">角色异构</h3>
+<p class="source-indent">为了把上述 4 阶段流程真正绑定到 T3 Code 的编排原语（<code>orchestrator_capabilities</code>、<code>delegate_task</code>、<code>task_status</code>、<code>task_cancel</code>），设计了机器可读配置 <code>.agents/resources/t3-routing.json</code> 与配套规范 <code>t3-routing.md</code>。把 <strong>5 款能力与成本梯度分明的模型精准分配给 13 个角色</strong>：</p>
+<div class="table-scroll" role="region" tabindex="0" aria-label="各角色的模型路由与思考档位"><table><colgroup><col style="width:18.97%"><col style="width:9.54%"><col style="width:24.83%"><col style="width:12.41%"><col style="width:34.25%"></colgroup><thead><tr><th scope="col"><p>角色名</p></th><th scope="col"><p>适用阶段</p></th><th scope="col"><p>默认路由（Provider / Model）</p></th><th scope="col"><p>思考档位</p></th><th scope="col"><p>职责与设计意图</p></th></tr></thead><tbody><tr><td><p><code>coordinator</code></p></td><td><p>1 / 2 / 3 / 4</p></td><td><p>沿用主对话模型（<code>parent_thread</code>）</p></td><td><p>沿用主对话</p></td><td><p>全局编排、迭代沟通、逐条核实双审发现、偏差登记与 ≤3 处小修自改。</p></td></tr><tr><td><p><code>researcher</code></p></td><td><p>1 / 2</p></td><td><p>浅层 <code>codex/gpt-6.1-terra</code><br>深挖 <code>antigravity/claude-opus-5-5</code></p></td><td><p><code>low</code> / <code>high</code></p></td><td><p>只读查代码、追踪调用链（<code>pstack-how</code>）与影响面（<code>pstack-blast-radius</code>）。</p></td></tr><tr><td><p><code>architect</code></p></td><td><p>2</p></td><td><p><code>antigravity/claude-opus-5-5</code></p></td><td><p><code>high</code></p></td><td><p>复杂技术方案、状态归属与提交边界定型、<code>pstack-arena</code> 候选对比与分层 Case 导图。</p></td></tr><tr><td><p><code>report-writer</code></p></td><td><p>1 / 2 / 4</p></td><td><p><code>antigravity/gemini-4-neon</code></p></td><td><p><code>medium</code> / <code>high</code></p></td><td><p>发挥长文结构化表达优势，撰写问询文档、主方案与按业务链路串讲的合并导读。</p></td></tr><tr><td><p><code>web-builder</code></p></td><td><p>1 / 2 / 4</p></td><td><p><code>codex/gpt-6.2-sol</code></p></td><td><p><code>medium</code> / <code>high</code></p></td><td><p>生图脚本、离线交互原型 <code>prototype/index.html</code> 与左右对照源码导览 HTML。</p></td></tr><tr><td><p><code>coder-simple</code></p></td><td><p>3</p></td><td><p><code>codex/gpt-6.2-sol</code></p></td><td><p><code>medium</code></p></td><td><p>步骤清晰的单模块常规编码、生成物同步与简单 Bug 修复。</p></td></tr><tr><td><p><code>coder-complex</code></p></td><td><p>3</p></td><td><p>主 <code>codex/gpt-6.2-astra</code><br>备 <code>antigravity/claude-opus-5-5</code></p></td><td><p><code>xhigh</code> / <code>high</code></p></td><td><p>跨包状态机、并发事务边界、崩溃恢复与 Schema 迁移；并行多路时切 <code>worktree</code> 隔离。</p></td></tr><tr><td><p><code>tool-runner</code></p></td><td><p>3</p></td><td><p><code>codex/gpt-6.1-terra</code></p></td><td><p><code>low</code></p></td><td><p>第一拍守门员：低成本跑路径裁剪增量工具检查并收口报错位置。</p></td></tr><tr><td><p><code>behavior-tester</code></p></td><td><p>3</p></td><td><p><code>codex/gpt-6.2-sol</code></p></td><td><p><code>medium</code></p></td><td><p>按方案 <code>F01..Fn</code> 编写并执行 <code>verify.mjs</code>，输出结构化 JSON 汇入离线报告。</p></td></tr><tr><td><p><code>ui-tester</code></p></td><td><p>3</p></td><td><p><code>codex/gpt-6.1-terra</code></p></td><td><p><code>low</code> / <code>medium</code></p></td><td><p>驱动真实浏览器（<code>preview_*</code> + Computer Use）点检界面并跑 <code>npm run uicheck</code>。</p></td></tr><tr><td><p><code>reviewer-correctness</code></p></td><td><p>3</p></td><td><p><code>codex/gpt-6.2-astra</code></p></td><td><p><code>high</code> / <code>xhigh</code></p></td><td><p><code>pstack-thermos</code> 正确性只读评审：状态转换、失败恢复、幂等与验收缺口。</p></td></tr><tr><td><p><code>reviewer-maintainability</code></p></td><td><p>3</p></td><td><p><code>antigravity/claude-opus-5-5</code></p></td><td><p><code>high</code></p></td><td><p><code>pstack-thermos</code> 可维护性只读评审：<strong>跨模型家族互补</strong>，交稿前两路互不可见。</p></td></tr><tr><td><p><code>deslopper</code></p></td><td><p>3</p></td><td><p>轻 <code>codex/gpt-6.1-terra</code><br>化简 <code>codex/gpt-6.2-sol</code></p></td><td><p><code>low</code></p></td><td><p><code>pstack-deslop</code> 清理 diff 中多余注释、重复判断与无职责包装，不改外部契约。</p></td></tr></tbody></table></div>
+<p>配套的 <code>fallback.policy: "inherit_parent"</code> 保证任何路由模型不可用或触发限流时平滑回落至主对话模型并在交付摘要中显式披露。</p>
+<figure><a href="assets/role-routing.webp" aria-label="查看原图：各开发阶段的角色分工和模型路由全景"><img src="assets/role-routing.webp" alt="各开发阶段的角色分工和模型路由全景" loading="lazy" decoding="async" width="2400" height="1592"></a><figcaption>角色编排全景</figcaption></figure>
+
+      <footer class="post-end"><a href="#top">回到文章开头</a></footer>
+    </article>
+  </main>
+</body>
+</html>

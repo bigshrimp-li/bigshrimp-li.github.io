@@ -1,0 +1,149 @@
+.note {
+  --teal: #09655c;
+  --soft: #edf3ed;
+  --display: "Inter", "Helvetica Neue", "PingFang SC", "Microsoft YaHei", sans-serif;
+  --mono: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+  background: #fafbf8;
+}
+
+.masthead, .note .shell {
+  width: min(calc(100% - 3rem), 74rem);
+  max-width: none;
+  margin-inline: auto;
+  padding-inline: 0;
+}
+
+.masthead { min-height: 4rem; padding-block: 1rem; }
+.masthead a { display: inline-flex; gap: .7rem; align-items: center; }
+.masthead a::before {
+  content: "";
+  border-radius: 2px;
+  width: .42rem;
+  height: 1.18rem;
+  background: var(--teal);
+}
+.masthead span { font-size: .88rem; }
+.note .shell {
+  display: grid;
+  grid-template-columns: minmax(0, 47rem) minmax(12rem, 15rem);
+  justify-content: space-between;
+  column-gap: clamp(2.25rem, 6vw, 6rem);
+  padding-block: clamp(2.5rem, 5.5vw, 5rem) 3rem;
+}
+.title-block { grid-column: 1; grid-row: 1; padding-bottom: 1.4rem; }
+.byline {
+  display: flex;
+  align-items: baseline;
+  gap: .8rem;
+  color: var(--teal);
+  font-weight: 650;
+  font-size: .88rem;
+}
+.byline time {
+  border-left: 1px solid #a9bdb5;
+  padding-left: .8rem;
+  color: var(--muted);
+  font: .82rem/1.1 var(--mono);
+  letter-spacing: .02em;
+}
+.title-block h1 {
+  margin: .65rem 0 .4rem;
+  font: 750 clamp(3.5rem, 7vw, 6rem)/1.06 var(--display);
+  letter-spacing: -.065em;
+}
+.deck {
+  margin: .7rem 0 0;
+  color: #385650;
+  font-size: clamp(1.13rem, 2.3vw, 1.6rem);
+  line-height: 1.6;
+}
+.chapters {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  align-self: start;
+  position: sticky;
+  top: 1.5rem;
+  border-block-start: 2px solid var(--teal);
+  max-height: calc(100vh - 3rem);
+  overflow: auto;
+}
+.chapters summary { cursor: pointer; padding: .7rem 0; font-weight: 650; font-size: .92rem; }
+.chapters nav { display: grid; gap: .15rem; margin: 0; padding: 0; border: 0; background: none; }
+.chapters nav a {
+  padding: .16rem .55rem;
+  border-inline-start: 2px solid transparent;
+  color: var(--muted);
+  line-height: 1.5;
+  font-size: .88rem;
+}
+.chapters nav .depth-2 { margin-top: .35rem; color: var(--ink); font-weight: 680; }
+.chapters nav .depth-3 { padding-inline-start: 1.3rem; }
+.chapters nav a:hover, .chapters nav a[aria-current="location"] {
+  color: var(--teal);
+  border-color: var(--teal);
+  background: var(--soft);
+}
+.prose { grid-column: 1; grid-row: 2; min-width: 0; line-height: 1.95; }
+.prose > p:first-child { margin-top: 0; }
+.prose h2, .prose h3 { font-family: var(--display); scroll-margin-top: 1.5rem; }
+.prose h2 {
+  margin: 2.75rem 0 1rem;
+  padding-top: 1.35rem;
+  font-size: clamp(1.75rem, 3vw, 2.2rem);
+  border-color: #9eb5aa;
+}
+.prose h3 { margin: 2.1rem 0 .55rem; font-size: 1.4rem; }
+.prose li::marker { color: var(--teal); font-weight: 650; }
+.prose figure { margin: 1.5rem 0 2.2rem; }
+.prose figure a { display: block; cursor: zoom-in; }
+.prose figure img { border-radius: .4rem; }
+.prose figcaption { margin-top: .5rem; font-size: .88rem; }
+.table-scroll {
+  margin: 1.2rem 0 1.9rem;
+  overflow-x: auto;
+  border: 1px solid var(--line);
+  border-radius: .45rem;
+  background: white;
+}
+.table-scroll table { min-width: 43rem; line-height: 1.7; }
+.table-scroll th { color: #21483e; background: #e4eee7; }
+.table-scroll tr:nth-child(even) td { background: #f4f7f3; }
+.table-scroll tr:last-child td { border-bottom: 0; }
+.table-scroll td, .table-scroll th { padding: .7rem .8rem; }
+.prose code { font-family: var(--mono); }
+.prose :not(pre) > code {
+  padding: .1em .22em;
+  border-radius: .2em;
+  color: #184f41;
+  background: #eaf1eb;
+  font-size: .89em;
+}
+.prose pre { background: #182d2a; color: #f0f6ee; line-height: 1.65; tab-size: 2; }
+.post-end { font-size: .95rem; }
+:focus-visible { outline: 2px solid var(--teal); outline-offset: 2px; }
+
+@media (max-width: 54rem) {
+  .note .shell { display: block; max-width: 47rem; }
+  .title-block { padding-bottom: 1.15rem; }
+  .chapters {
+    position: static;
+    max-height: none;
+    margin: .4rem 0 1.4rem;
+    border-block: 1px solid var(--line);
+  }
+  .chapters nav { padding: 0 0 1rem; }
+}
+@media (max-width: 35rem) {
+  .masthead, .note .shell { width: calc(100% - 2.25rem); }
+  .note { font-size: 1rem; }
+  .prose h3 { font-size: 1.25rem; }
+  .table-scroll td, .table-scroll th { padding: .6rem; }
+}
+@media print {
+  .masthead, .chapters, .post-end { display: none; }
+  .note .shell { display: block; width: 100%; padding: 0; }
+  .table-scroll { overflow: visible; }
+  .table-scroll table { min-width: 0; }
+  .prose pre { white-space: pre-wrap; }
+}
